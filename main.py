@@ -59,6 +59,7 @@ def load_steering_img(data_dir, df):
     return image_paths, steerings
 
 
+
 #Data PreProcess
 def preprocess_img(img):
     img = mpimg.imread(img)
@@ -77,6 +78,7 @@ def preprocess_img_no_imread(img):
     return img
 
 
+# Remove images with steering angles of 0
 def balance_steering_angle():
 
     # Count the number of samples for each steering angle value and store it in a dictionary.
@@ -148,11 +150,26 @@ def img_random_flip(image_to_flip, steering_angle):
     steering_angle = -steering_angle
     return flipped_image, steering_angle
 
+# Shadowing the images will help the model handle different lighting conditions better
+def img_random_shadow(image_to_shadow):
+    shadow = iaa.AdditiveGaussianNoise(scale=0.2*255)
+    shadow_image = shadow.augment_image(image_to_shadow)
+    return shadow_image
+
+# Rotating the images exposes the model of different orientations of the same object
+def img_random_rotation(image_to_rotate):
+    rotate = iaa.Affine(rotate=(-10, 10))
+    rotated_image = rotate.augment_image(image_to_rotate)
+    return rotated_image
 
 def random_augment(image_to_augment, steering_angle):
     augment_image = mpimg.imread(image_to_augment)
     if np.random.rand() < 0.5:
         augment_image = zoom(augment_image)
+    if np.random.rand() < 0.5:
+        augment_image = img_random_shadow(augment_image)
+    if np.random.rand() < 0.5:
+        augment_image = img_random_rotation(augment_image)
     if np.random.rand() < 0.5:
         augment_image = pan(augment_image)
     if np.random.rand() < 0.5:
@@ -252,6 +269,28 @@ axs[0].imshow(original_image)
 axs[0].set_title("Original Image")
 axs[1].imshow(zoomed_image)
 axs[1].set_title("Zoomed Image")
+plt.show()
+
+image = image_paths[random.randint(0, 1000)]
+original_image = mpimg.imread(image)
+shadowed_image = img_random_shadow(original_image)
+fig, axs = plt.subplots(1, 2, figsize=(15, 10))
+fig.tight_layout()
+axs[0].imshow(original_image)
+axs[0].set_title("Original Image")
+axs[1].imshow(shadowed_image)
+axs[1].set_title("Shadow Image")
+plt.show()
+
+image = image_paths[random.randint(0, 1000)]
+original_image = mpimg.imread(image)
+rotated_image = img_random_rotation(original_image)
+fig, axs = plt.subplots(1, 2, figsize=(15, 10))
+fig.tight_layout()
+axs[0].imshow(original_image)
+axs[0].set_title("Original Image")
+axs[1].imshow(rotated_image)
+axs[1].set_title("Rotated Image")
 plt.show()
 
 image = image_paths[random.randint(0, 1000)]
