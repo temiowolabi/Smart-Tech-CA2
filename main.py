@@ -5,6 +5,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from keras.utils.np_utils import to_categorical
+from keras.callbacks import EarlyStopping
 import random
 from PIL import Image
 import cv2
@@ -35,6 +36,7 @@ columns = ['center', 'left', 'right', 'steering', 'throttle', 'reverse', 'speed'
 #read csv file
 data = pd.read_csv(os.path.join(datadir, 'driving_log.csv'), names = columns)
 pd.set_option('display.max_columns', 7)
+early_stop = EarlyStopping(monitor='val_loss', patience=3)
 
 #return image name
 def path_leaf(path):
@@ -113,14 +115,14 @@ def nvidia_model():
     model.add(Convolution2D(64, (3, 3), activation='elu'))
     model.add(Convolution2D(64, (3, 3), activation='elu'))
     model.add(Flatten())
-    model.add(Dense(100, activation='elu'))
-    model.add(Dense(50, activation='elu'))
-    model.add(Dense(10, activation='elu'))
+    model.add(Dense(100, activation='elu'))  # 100 neurons
+    model.add(Dense(50, activation='elu'))  # 50 neurons
+    model.add(Dense(10, activation='elu'))  # 10 neurons
 
     #output layer
     model.add(Dense(1))
     optimizer = Adam(learning_rate=0.0001)
-    model.compile(loss='mse', optimizer=optimizer)
+    model.compile(loss='mse', optimizer=optimizer, metrics=["accuracy"])
     return model
 
 
@@ -347,7 +349,14 @@ plt.show()
 model = nvidia_model()
 print(model.summary())
 
-history = model.fit(batch_generator(X_train, y_train, 200, 1), steps_per_epoch=100, epochs=30, validation_data=batch_generator(X_valid, y_valid, 200, 0), validation_steps=200, verbose=1, shuffle=1)
+"""
+For Early Stopping...
+See: https://towardsdatascience.com/a-practical-introduction-to-early-stopping-in-machine-learning-550ac88bc8fd
+"""
+
+history = model.fit(batch_generator(X_train, y_train, 200, 1), steps_per_epoch=100, epochs=30, validation_data=batch_generator(X_valid, y_valid, 200, 0), validation_steps=200, verbose=1, shuffle=1, callbacks=[early_stop])
+#history = model.fit(batch_generator(X_train, y_train, 200, 1), steps_per_epoch=100, epochs=5, validation_data=batch_generator(X_valid, y_valid, 200, 0), validation_steps=200, verbose=1, shuffle=1)
+
 
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
@@ -356,4 +365,6 @@ plt.title('Loss')
 plt.xlabel("Epoch")
 plt.show()
 
+# Save Model
+print("Saving Model...")
 model.save('model.h5')
