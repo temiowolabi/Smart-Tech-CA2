@@ -6,6 +6,7 @@ from keras.layers import Dense
 from keras.optimizers import Adam
 from keras.utils.np_utils import to_categorical
 from keras.callbacks import EarlyStopping
+from keras import regularizers
 import random
 from PIL import Image
 import cv2
@@ -104,11 +105,15 @@ def balance_steering_angle():
 
     balanced_df = pd.DataFrame(balanced_data, columns=columns)
 
-
+"""
+For Regularization...
+See: https://www.projectpro.io/recipes/add-regularization-regression-keras
+"""
 def nvidia_model():
     model = Sequential() #linear stack of layers
 
     #convolutional layers
+    model.add(Dense(64, input_shape=(64,), kernel_regularizer=regularizers.l2(0.01)))
     model.add(Convolution2D(24, (5, 5), strides=(2, 2), input_shape=(66, 200, 3), activation='elu'))
     model.add(Convolution2D(36, (5, 5), strides=(2, 2), activation='elu'))
     model.add(Convolution2D(48, (5, 5), strides=(2, 2), activation='elu'))
