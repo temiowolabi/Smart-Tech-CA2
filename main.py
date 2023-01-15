@@ -33,7 +33,10 @@ import tensorflow.keras
 
 #Load Data
 #datadir = "C:\\Users\\madok\\Downloads\\beta_simulator_windows\\BCData"
-datadir = "./Track1"
+#datadir = "./Track1"
+datadir = [
+    ("./Track1"),
+    ("./Track2")]
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'reverse', 'speed']
 #read csv file
 data = pd.read_csv(os.path.join(datadir, 'driving_log.csv'), names = columns)
