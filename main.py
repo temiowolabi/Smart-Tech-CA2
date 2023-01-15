@@ -23,6 +23,7 @@ import ntpath
 from matplotlib import image as mpimg
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 from imgaug import augmenters as iaa
 
 import tensorflow.keras
@@ -32,7 +33,7 @@ import tensorflow.keras
 
 #Load Data
 #datadir = "C:\\Users\\madok\\Downloads\\beta_simulator_windows\\BCData"
-datadir = "C:\\Users\\madok\\Desktop"
+datadir = "./Track1"
 columns = ['center', 'left', 'right', 'steering', 'throttle', 'reverse', 'speed']
 #read csv file
 data = pd.read_csv(os.path.join(datadir, 'driving_log.csv'), names = columns)
@@ -113,7 +114,7 @@ def nvidia_model():
     model = Sequential() #linear stack of layers
 
     #convolutional layers
-    model.add(Dense(64, input_shape=(64,), kernel_regularizer=regularizers.l2(0.01)))
+   # model.add(Dense(64, input_shape=(64,), kernel_regularizer=regularizers.l2(0.01)))
     model.add(Convolution2D(24, (5, 5), strides=(2, 2), input_shape=(66, 200, 3), activation='elu'))
     model.add(Convolution2D(36, (5, 5), strides=(2, 2), activation='elu'))
     model.add(Convolution2D(48, (5, 5), strides=(2, 2), activation='elu'))
