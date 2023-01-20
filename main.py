@@ -356,5 +356,5 @@ plt.title('Loss')
 plt.xlabel("Epoch")
 plt.show()
 
-model.save('model2.h5')
-print("Saved to Model2.h5")
+model.save('model3.h5')
+print("Saved to Model3.h5")
